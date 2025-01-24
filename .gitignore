@@ -1,0 +1,16 @@
+# Node modules
+node_modules/
+
+# Directorio de compilación (TypeScript)
+dist/
+
+# Archivos de salida de Serverless
+.serverless/
+.build/
+
+# Logs
+*.log
+
+# Archivos de configuración local
+.env
+.env.*

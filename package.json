@@ -1,0 +1,27 @@
+{
+	"name": "backend-softtek-challenge",
+	"version": "1.0.0",
+	"description": "A project integrating the Star Wars API and another public API, merging data into a logical model. Features endpoints for retrieving merged data, storing custom information, and querying history with caching and AWS cost optimization. Built with TypeScript, Serverless Framework, and DynamoDB/MySQL.",
+	"main": "index.js",
+	"scripts": {
+		"dev": "serverless offline",
+		"deploy": "serverless deploy",
+		"remove": "serverless remove",
+		"sls": "serverless"
+	},
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@types/aws-lambda": "^8.10.147",
+		"@types/node": "^22.10.10",
+		"nodemon": "^3.1.9",
+		"serverless": "^4.5.0",
+		"serverless-offline": "^14.4.0",
+		"ts-node": "^10.9.2",
+		"tsyringe": "^4.8.0",
+		"typescript": "^5.7.3"
+	},
+	"dependencies": {
+		"reflect-metadata": "^0.2.2"
+	}
+}
