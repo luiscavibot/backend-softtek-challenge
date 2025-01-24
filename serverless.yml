@@ -1,24 +1,38 @@
-service: backend-softtek-challenge
-
+service: mi-proyecto-clean-architecture
 frameworkVersion: '4'
 
 provider:
     name: aws
     runtime: nodejs20.x
-    region: us-east-2
+    region: us-east-1
     stage: dev
-    # Permisos necesarios (opcional), puedes agregar policies o roles
-
-plugins:
-    - serverless-offline
 
 functions:
+    # Ejemplo: Endpoints para Star Wars People
+    getPeople:
+        handler: src/interface/lambda/handlers/swapiPeopleHandler.getPeopleHandler
+        events:
+            - http:
+                  path: fusionados/people
+                  method: get
+
+    getPersonById:
+        handler: src/interface/lambda/handlers/swapiPeopleHandler.getPersonByIdHandler
+        events:
+            - http:
+                  path: fusionados/people/{id}
+                  method: get
+
+    # Ejemplo anterior: createUser
     createUser:
         handler: src/interface/lambda/handlers/userHandler.createUserHandler
         events:
             - http:
                   path: users
                   method: post
+
+plugins:
+    - serverless-offline
 
 custom:
     esbuild:
@@ -28,14 +42,4 @@ custom:
         target: 'node20'
         platform: 'node'
         concurrency: 10
-        tsconfig:
-            'tsconfig.json'
-
-            # Si tu archivo se llama src/handler.ts, con la exportación 'handler',
-            # esbuild se encarga de generar un output con esa función.
-
-        # Config para serverless-offline (opcional)
-        # serverless-offline:
-        #   port: 3000
-        #   host: 0.0.0.0
-        #   noPrependStageInUrl: true
+        # tsconfig: 'tsconfig.json'
