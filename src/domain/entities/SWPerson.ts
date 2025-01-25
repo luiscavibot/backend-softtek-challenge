@@ -11,5 +11,4 @@ export interface SWPerson {
 	eye_color: string;
 	birth_year: string;
 	gender: string;
-	// Otros campos de SWAPI si lo requieres
 }

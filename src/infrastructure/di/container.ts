@@ -1,4 +1,3 @@
-// src/infrastructure/di/container.ts
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
@@ -16,24 +15,32 @@ import { HistoryRepository } from '../repositories/HistoryRepository';
 
 import { ICacheRepository } from '../../domain/repositories/ICacheRepository';
 import { RedisCacheRepository } from '../repositories/RedisCacheRepository';
+import { NoOpCacheRepository } from '../repositories/NoOpCacheRepository';
 
 // 1) Config
-container.register<IAppConfig>('AppConfig', { useClass: AppConfig });
+container.register<IAppConfig>('AppConfig', {
+	useClass: AppConfig,
+});
 
-// 2) Repos
+// 2) Repos SWAPI
 container.register<ISwapiPeopleRepository>('SwapiPeopleRepository', {
 	useClass: SwapiPeopleRepository,
 });
+
+// 3) Repos NASA
 container.register<INasaApodRepository>('NasaApodRepository', {
 	useClass: NasaApodRepository,
 });
+
+// 4) Historial
 container.register<IHistoryRepository>('HistoryRepository', {
 	useClass: HistoryRepository,
 });
 
-// 3) Cache
+// 5) Cache: si IS_OFFLINE=true => NoOp, si no => Redis
+const isOffline = process.env.IS_OFFLINE === 'true';
 container.register<ICacheRepository>('CacheRepository', {
-	useClass: RedisCacheRepository,
+	useClass: isOffline ? NoOpCacheRepository : RedisCacheRepository,
 });
 
 export { container };

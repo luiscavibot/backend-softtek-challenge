@@ -4,10 +4,12 @@
 	"description": "A project integrating the Star Wars API and another public API, merging data into a logical model. Features endpoints for retrieving merged data, storing custom information, and querying history with caching and AWS cost optimization. Built with TypeScript, Serverless Framework, and DynamoDB/MySQL.",
 	"main": "index.js",
 	"scripts": {
-		"dev": "serverless offline",
+		"dev": "IS_OFFLINE=true serverless offline",
 		"deploy": "serverless deploy --stage prod",
 		"remove": "serverless remove --stage prod",
-		"sls": "serverless"
+		"sls": "serverless",
+		"test": "jest --coverage",
+		"test:watch": "jest --watch"
 	},
 	"author": "",
 	"license": "ISC",
