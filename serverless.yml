@@ -12,6 +12,8 @@ provider:
         NASA_APOD_URL: ${env:NASA_APOD_URL_${opt:stage, 'dev'}}
         SWAPI_PEOPLE_URL: ${env:SWAPI_PEOPLE_URL_${opt:stage, 'dev'}}
         HISTORY_TABLE: ${env:HISTORY_TABLE_${opt:stage, 'dev'}}
+        IS_OFFLINE: ${env:IS_OFFLINE_${opt:stage, 'dev'}}
+        AWS_REGION: ${env:AWS_REGION_${opt:stage, 'dev'}}
 
     iam:
         role:
@@ -60,6 +62,7 @@ functions:
 plugins:
     - serverless-offline
     - '@jimdo/serverless-dotenv'
+    - serverless-dynamodb-local
 
 resources:
     Resources:
@@ -80,6 +83,15 @@ resources:
                       KeyType: RANGE
 
 custom:
+    dynamodb:
+        stages:
+            - dev
+        start:
+            host: localhost
+            port: 8000 # Asegúrate de usar el puerto donde tu Docker corre DynamoDB
+            noStart: true
+            migrate: true
+
     esbuild:
         bundle: true
         minify: false

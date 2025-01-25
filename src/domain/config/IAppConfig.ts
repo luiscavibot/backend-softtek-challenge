@@ -3,4 +3,6 @@ export interface IAppConfig {
 	NASA_APOD_URL: string;
 	SWAPI_PEOPLE_URL: string;
 	HISTORY_TABLE: string;
+	IS_OFFLINE: string;
+	AWS_REGION: string;
 }

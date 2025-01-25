@@ -12,7 +12,6 @@ export const getPeopleHandler = async (
 	try {
 		const useCase = container.resolve(GetAllPeopleUseCase);
 		const data = await useCase.execute();
-		console.log('data-->', data);
 
 		// Guardar en historial
 		const historyRepo =
