@@ -5,11 +5,11 @@ provider:
     name: aws
     runtime: nodejs20.x
     region: us-east-1
-    stage: dev
-    # environment:
-    #     NASA_API_KEY: ${env:NASA_API_KEY}
-    #     NASA_APOD_URL: ${env:NASA_APOD_URL}
-    #     SWAPI_PEOPLE_URL: ${env:SWAPI_PEOPLE_URL}
+    stage: ${opt:stage, 'dev'}
+    environment:
+        NASA_API_KEY: ${env:NASA_API_KEY_${opt:stage, 'dev'}}
+        NASA_APOD_URL: ${env:NASA_APOD_URL_${opt:stage, 'dev'}}
+        SWAPI_PEOPLE_URL: ${env:SWAPI_PEOPLE_URL_${opt:stage, 'dev'}}
 
 functions:
     # Ejemplo: Endpoints para Star Wars People
@@ -37,6 +37,7 @@ functions:
 
 plugins:
     - serverless-offline
+    - '@jimdo/serverless-dotenv'
 
 custom:
     esbuild:

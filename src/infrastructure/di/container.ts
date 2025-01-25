@@ -12,11 +12,6 @@ import { NasaApodRepository } from '../repositories/NasaApodRepository';
 import { ISwapiPeopleRepository } from '../../domain/repositories/ISwapiPeopleRepository';
 import { SwapiPeopleRepository } from '../repositories/SwapiPeopleRepository';
 
-if (process.env.NODE_ENV !== 'production') {
-	dotenv.config();
-	console.log('Environment variables loaded in development mode...');
-}
-
 // 1) Registro de AppConfig como "AppConfig"
 container.register<IAppConfig>('AppConfig', {
 	useClass: AppConfig,
