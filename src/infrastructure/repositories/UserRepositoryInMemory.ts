@@ -6,7 +6,6 @@ export class UserRepositoryInMemory implements IUserRepository {
 
 	async createUser(user: User): Promise<User> {
 		this.users.push(user);
-		console.log('Users-->', this.users);
 		return user;
 	}
 

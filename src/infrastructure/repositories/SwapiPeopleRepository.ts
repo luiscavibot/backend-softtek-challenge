@@ -1,13 +1,14 @@
 import { ISwapiPeopleRepository } from '../../domain/repositories/ISwapiPeopleRepository';
 import { SWPerson } from '../../domain/entities/SWPerson';
+import { inject, injectable } from 'tsyringe';
+import { IAppConfig } from '../../domain/config/IAppConfig';
 
-// Ojo: Si usas Node 18+ es probable que fetch ya esté disponible.
-// De lo contrario, instala "node-fetch" o usa "axios".
-const BASE_URL = 'https://swapi.dev/api/people';
-
+@injectable()
 export class SwapiPeopleRepository implements ISwapiPeopleRepository {
+	constructor(@inject('AppConfig') private readonly config: IAppConfig) {}
+
 	async getAllPeople(): Promise<SWPerson[]> {
-		const response = await fetch(`${BASE_URL}/`);
+		const response = await fetch(`${this.config.SWAPI_PEOPLE_URL}/`);
 		if (!response.ok) {
 			throw new Error(`Error fetching people: ${response.status}`);
 		}
@@ -19,7 +20,7 @@ export class SwapiPeopleRepository implements ISwapiPeopleRepository {
 	}
 
 	async getPersonById(id: string): Promise<SWPerson> {
-		const response = await fetch(`${BASE_URL}/${id}`);
+		const response = await fetch(`${this.config.SWAPI_PEOPLE_URL}/${id}`);
 		if (!response.ok) {
 			throw new Error(
 				`Error fetching person by id ${id}: ${response.status}`

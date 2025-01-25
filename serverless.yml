@@ -6,6 +6,10 @@ provider:
     runtime: nodejs20.x
     region: us-east-1
     stage: dev
+    environment:
+        NASA_API_KEY: ${env:NASA_API_KEY}
+        NASA_APOD_URL: ${env:NASA_APOD_URL}
+        SWAPI_PEOPLE_URL: ${env:SWAPI_PEOPLE_URL}
 
 functions:
     # Ejemplo: Endpoints para Star Wars People
@@ -33,6 +37,7 @@ functions:
 
 plugins:
     - serverless-offline
+    - '@jimdo/serverless-dotenv'
 
 custom:
     esbuild:
@@ -43,3 +48,9 @@ custom:
         platform: 'node'
         concurrency: 10
         # tsconfig: 'tsconfig.json'
+    dotenv:
+        path: .env # ruta a tu archivo .env
+        # Si quieres que se marquen como obligatorias ciertas variables:
+        # required:
+        #   - NASA_API_KEY
+        #   - OTRA_VARIABLE

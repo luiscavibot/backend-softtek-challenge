@@ -3,21 +3,18 @@ import { container } from '../../../infrastructure/di/container';
 import { GetAllPeopleUseCase } from '../../../application/use-cases/GetAllPeopleUseCase';
 import { GetPersonByIdUseCase } from '../../../application/use-cases/GetPersonByIdUseCase';
 
-/**
- * Handler para GET /fusionados/people
- */
 export const getPeopleHandler = async (
 	event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
 	try {
 		const useCase = container.resolve(GetAllPeopleUseCase);
-		const people = await useCase.execute();
+		const data = await useCase.execute();
 
 		return {
 			statusCode: 200,
 			body: JSON.stringify({
-				message: 'List of SW characters',
-				data: people,
+				message: 'List of SW characters with APOD',
+				data,
 			}),
 		};
 	} catch (error: any) {
@@ -28,9 +25,6 @@ export const getPeopleHandler = async (
 	}
 };
 
-/**
- * Handler para GET /fusionados/people/{id}
- */
 export const getPersonByIdHandler = async (
 	event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
@@ -44,13 +38,13 @@ export const getPersonByIdHandler = async (
 		}
 
 		const useCase = container.resolve(GetPersonByIdUseCase);
-		const person = await useCase.execute(id);
+		const data = await useCase.execute(id);
 
 		return {
 			statusCode: 200,
 			body: JSON.stringify({
-				message: `Character with id = ${id}`,
-				data: person,
+				message: `Character ${id} with APOD`,
+				data,
 			}),
 		};
 	} catch (error: any) {

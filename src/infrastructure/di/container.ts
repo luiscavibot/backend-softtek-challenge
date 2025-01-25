@@ -1,20 +1,30 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { IUserRepository } from '../../domain/repositories/IUserRepository';
-import { UserRepositoryInMemory } from '../repositories/UserRepositoryInMemory';
+import { IAppConfig } from '../../domain/config/IAppConfig';
+import { AppConfig } from '../config/AppConfig';
+
+import { INasaApodRepository } from '../../domain/repositories/INasaApodRepository';
+import { NasaApodRepository } from '../repositories/NasaApodRepository';
 
 import { ISwapiPeopleRepository } from '../../domain/repositories/ISwapiPeopleRepository';
 import { SwapiPeopleRepository } from '../repositories/SwapiPeopleRepository';
 
-// Registro de tu UserRepository (ejemplo anterior)
-container.register<IUserRepository>('UserRepository', {
-	useClass: UserRepositoryInMemory,
+// 1) Registro de AppConfig como "AppConfig"
+container.register<IAppConfig>('AppConfig', {
+	useClass: AppConfig,
 });
 
-// Registro de SwapiPeopleRepository para SWAPI
+// 2) NASA
+container.register<INasaApodRepository>('NasaApodRepository', {
+	useClass: NasaApodRepository,
+});
+
+// 3) SWAPI
 container.register<ISwapiPeopleRepository>('SwapiPeopleRepository', {
 	useClass: SwapiPeopleRepository,
 });
 
+// 4) Otras dependencias (UserRepository, etc.)
+// ...
 export { container };
