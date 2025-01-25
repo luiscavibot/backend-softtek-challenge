@@ -8,7 +8,9 @@ export class SwapiPeopleRepository implements ISwapiPeopleRepository {
 	constructor(@inject('AppConfig') private readonly config: IAppConfig) {}
 
 	async getAllPeople(): Promise<SWPerson[]> {
+		console.log('Llamando SWAPI para obtener lista de personajes...');
 		const response = await fetch(`${this.config.SWAPI_PEOPLE_URL}/`);
+		console.log('Respuesta de SWAPI recibida');
 		if (!response.ok) {
 			throw new Error(`Error fetching people: ${response.status}`);
 		}

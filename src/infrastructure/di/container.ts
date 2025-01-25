@@ -14,24 +14,26 @@ import { NasaApodRepository } from '../repositories/NasaApodRepository';
 import { IHistoryRepository } from '../../domain/repositories/IHistoryRepository';
 import { HistoryRepository } from '../repositories/HistoryRepository';
 
-// Config
-container.register<IAppConfig>('AppConfig', {
-	useClass: AppConfig,
-});
+import { ICacheRepository } from '../../domain/repositories/ICacheRepository';
+import { RedisCacheRepository } from '../repositories/RedisCacheRepository';
 
-// Repos SWAPI
+// 1) Config
+container.register<IAppConfig>('AppConfig', { useClass: AppConfig });
+
+// 2) Repos
 container.register<ISwapiPeopleRepository>('SwapiPeopleRepository', {
 	useClass: SwapiPeopleRepository,
 });
-
-// Repos NASA
 container.register<INasaApodRepository>('NasaApodRepository', {
 	useClass: NasaApodRepository,
 });
-
-// Historial
 container.register<IHistoryRepository>('HistoryRepository', {
 	useClass: HistoryRepository,
+});
+
+// 3) Cache
+container.register<ICacheRepository>('CacheRepository', {
+	useClass: RedisCacheRepository,
 });
 
 export { container };

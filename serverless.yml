@@ -1,4 +1,4 @@
-service: mi-proyecto-clean-architecture
+service: backend-softtek-challenge
 frameworkVersion: '4'
 
 provider:
@@ -7,13 +7,24 @@ provider:
     region: us-east-2
     stage: ${opt:stage, 'dev'}
 
+    # Lambdas se ubican en las subnets privadas y usan SG de Lambda
+    vpc:
+        securityGroupIds:
+            - Fn::GetAtt: [MyLambdaSG, GroupId]
+        subnetIds:
+            - Ref: MyPrivateSubnet1
+            - Ref: MyPrivateSubnet2
+
     environment:
         NASA_API_KEY: ${env:NASA_API_KEY_${opt:stage, 'dev'}}
         NASA_APOD_URL: ${env:NASA_APOD_URL_${opt:stage, 'dev'}}
         SWAPI_PEOPLE_URL: ${env:SWAPI_PEOPLE_URL_${opt:stage, 'dev'}}
         HISTORY_TABLE: ${env:HISTORY_TABLE_${opt:stage, 'dev'}}
         IS_OFFLINE: ${env:IS_OFFLINE_${opt:stage, 'dev'}}
-        AWS_REGION: ${env:AWS_REGION_${opt:stage, 'dev'}}
+
+        # Redis config: Ajusta con la dirección final o con un output/manual
+        REDIS_HOST: 'fusionados-redis-prod.wizndr.0001.use2.cache.amazonaws.com'
+        REDIS_PORT: '6379'
 
     iam:
         role:
@@ -27,9 +38,9 @@ provider:
                       - dynamodb:DeleteItem
                   Resource:
                       - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.HISTORY_TABLE}'
+                # Agrega más permisos si lo requieres
 
 functions:
-    # Ejemplo: Endpoints para Star Wars People
     getPeople:
         handler: src/interface/lambda/handlers/swapiPeopleHandler.getPeopleHandler
         events:
@@ -44,7 +55,6 @@ functions:
                   path: fusionados/people/{id}
                   method: get
 
-    # Ejemplo anterior: createUser
     createUser:
         handler: src/interface/lambda/handlers/userHandler.createUserHandler
         events:
@@ -66,6 +76,227 @@ plugins:
 
 resources:
     Resources:
+        # --------------------------------------------------------------------------------
+        # 1. VPC
+        # --------------------------------------------------------------------------------
+        MyVPC:
+            Type: AWS::EC2::VPC
+            Properties:
+                CidrBlock: '10.0.0.0/16'
+                EnableDnsHostnames: true
+                EnableDnsSupport: true
+                Tags:
+                    - Key: Name
+                      Value: 'myServerlessVPC-${self:provider.stage}'
+
+        # --------------------------------------------------------------------------------
+        # 2. Internet Gateway (para subnets públicas)
+        # --------------------------------------------------------------------------------
+        MyInternetGateway:
+            Type: AWS::EC2::InternetGateway
+            Properties:
+                Tags:
+                    - Key: Name
+                      Value: 'myInternetGateway-${self:provider.stage}'
+
+        MyVPCGatewayAttachment:
+            Type: AWS::EC2::VPCGatewayAttachment
+            Properties:
+                VpcId: !Ref MyVPC
+                InternetGatewayId: !Ref MyInternetGateway
+
+        # --------------------------------------------------------------------------------
+        # 3. Subnets Públicas
+        # --------------------------------------------------------------------------------
+        MyPublicSubnet1:
+            Type: AWS::EC2::Subnet
+            Properties:
+                VpcId: !Ref MyVPC
+                AvailabilityZone: 'us-east-2a'
+                CidrBlock: '10.0.1.0/24'
+                MapPublicIpOnLaunch: true
+                Tags:
+                    - Key: Name
+                      Value: 'myPublicSubnet1-${self:provider.stage}'
+
+        MyPublicSubnet2:
+            Type: AWS::EC2::Subnet
+            Properties:
+                VpcId: !Ref MyVPC
+                AvailabilityZone: 'us-east-2b'
+                CidrBlock: '10.0.2.0/24'
+                MapPublicIpOnLaunch: true
+                Tags:
+                    - Key: Name
+                      Value: 'myPublicSubnet2-${self:provider.stage}'
+
+        # Route Table para subnets públicas
+        MyPublicRouteTable:
+            Type: AWS::EC2::RouteTable
+            Properties:
+                VpcId: !Ref MyVPC
+                Tags:
+                    - Key: Name
+                      Value: 'myPublicRouteTable-${self:provider.stage}'
+
+        MyPublicRoute:
+            Type: AWS::EC2::Route
+            Properties:
+                RouteTableId: !Ref MyPublicRouteTable
+                DestinationCidrBlock: '0.0.0.0/0'
+                GatewayId: !Ref MyInternetGateway
+
+        # Asociaciones de route table con cada subnet pública
+        MyPublicSubnet1RouteTableAssoc:
+            Type: AWS::EC2::SubnetRouteTableAssociation
+            Properties:
+                SubnetId: !Ref MyPublicSubnet1
+                RouteTableId: !Ref MyPublicRouteTable
+
+        MyPublicSubnet2RouteTableAssoc:
+            Type: AWS::EC2::SubnetRouteTableAssociation
+            Properties:
+                SubnetId: !Ref MyPublicSubnet2
+                RouteTableId: !Ref MyPublicRouteTable
+
+        # --------------------------------------------------------------------------------
+        # 4. NAT Gateway (para subnets privadas)
+        # --------------------------------------------------------------------------------
+        MyNatEIP:
+            Type: AWS::EC2::EIP
+            Properties:
+                Domain: vpc
+
+        MyNatGateway:
+            Type: AWS::EC2::NatGateway
+            Properties:
+                AllocationId: !GetAtt MyNatEIP.AllocationId
+                SubnetId: !Ref MyPublicSubnet1 # NAT Gateway se ubica en una subnet pública
+                Tags:
+                    - Key: Name
+                      Value: 'myNatGateway-${self:provider.stage}'
+
+        # --------------------------------------------------------------------------------
+        # 5. Subnets Privadas
+        # --------------------------------------------------------------------------------
+        MyPrivateSubnet1:
+            Type: AWS::EC2::Subnet
+            Properties:
+                VpcId: !Ref MyVPC
+                AvailabilityZone: 'us-east-2a'
+                CidrBlock: '10.0.101.0/24'
+                MapPublicIpOnLaunch: false
+                Tags:
+                    - Key: Name
+                      Value: 'myPrivateSubnet1-${self:provider.stage}'
+
+        MyPrivateSubnet2:
+            Type: AWS::EC2::Subnet
+            Properties:
+                VpcId: !Ref MyVPC
+                AvailabilityZone: 'us-east-2b'
+                CidrBlock: '10.0.102.0/24'
+                MapPublicIpOnLaunch: false
+                Tags:
+                    - Key: Name
+                      Value: 'myPrivateSubnet2-${self:provider.stage}'
+
+        # Route Table para subnets privadas
+        MyPrivateRouteTable:
+            Type: AWS::EC2::RouteTable
+            Properties:
+                VpcId: !Ref MyVPC
+                Tags:
+                    - Key: Name
+                      Value: 'myPrivateRouteTable-${self:provider.stage}'
+
+        MyPrivateRoute:
+            Type: AWS::EC2::Route
+            Properties:
+                RouteTableId: !Ref MyPrivateRouteTable
+                DestinationCidrBlock: '0.0.0.0/0'
+                NatGatewayId: !Ref MyNatGateway
+
+        # Asociaciones de route table con cada subnet privada
+        MyPrivateSubnet1RouteTableAssoc:
+            Type: AWS::EC2::SubnetRouteTableAssociation
+            Properties:
+                SubnetId: !Ref MyPrivateSubnet1
+                RouteTableId: !Ref MyPrivateRouteTable
+
+        MyPrivateSubnet2RouteTableAssoc:
+            Type: AWS::EC2::SubnetRouteTableAssociation
+            Properties:
+                SubnetId: !Ref MyPrivateSubnet2
+                RouteTableId: !Ref MyPrivateRouteTable
+
+        # --------------------------------------------------------------------------------
+        # 6. Security Group para Lambdas
+        # --------------------------------------------------------------------------------
+        MyLambdaSG:
+            Type: AWS::EC2::SecurityGroup
+            Properties:
+                GroupDescription: 'Security group for serverless Lambdas'
+                VpcId: !Ref MyVPC
+                SecurityGroupIngress:
+                    # Normalmente Lambdas no necesitan inbound, a menos que quieras debugger/SSH
+                SecurityGroupEgress:
+                    # Permite salir a cualquier lado (para llamadas a internet, NASA, SWAPI, etc.)
+                    - IpProtocol: -1
+                      CidrIp: 0.0.0.0/0
+                Tags:
+                    - Key: Name
+                      Value: 'myLambdaSG-${self:provider.stage}'
+
+        # --------------------------------------------------------------------------------
+        # 7. Security Group para Redis
+        # --------------------------------------------------------------------------------
+        MyRedisSG:
+            Type: AWS::EC2::SecurityGroup
+            Properties:
+                GroupDescription: 'Security group for Redis ElastiCache'
+                VpcId: !Ref MyVPC
+                SecurityGroupIngress:
+                    # Permitir conexiones desde el SG de Lambda en el puerto 6379
+                    - IpProtocol: tcp
+                      FromPort: 6379
+                      ToPort: 6379
+                      SourceSecurityGroupId: !GetAtt MyLambdaSG.GroupId
+                SecurityGroupEgress:
+                    - IpProtocol: -1
+                      CidrIp: 0.0.0.0/0
+                Tags:
+                    - Key: Name
+                      Value: 'myRedisSG-${self:provider.stage}'
+
+        # --------------------------------------------------------------------------------
+        # 8. ElastiCache Subnet Group
+        # --------------------------------------------------------------------------------
+        MyRedisSubnetGroup:
+            Type: AWS::ElastiCache::SubnetGroup
+            Properties:
+                Description: 'Subnet Group for my Redis cluster'
+                SubnetIds:
+                    - !Ref MyPrivateSubnet1
+                    - !Ref MyPrivateSubnet2
+
+        # --------------------------------------------------------------------------------
+        # 9. ElastiCache (Redis)
+        # --------------------------------------------------------------------------------
+        MyRedisCache:
+            Type: AWS::ElastiCache::CacheCluster
+            Properties:
+                Engine: 'redis'
+                CacheNodeType: 'cache.t3.micro'
+                NumCacheNodes: 1
+                ClusterName: 'fusionados-redis-${self:provider.stage}'
+                VpcSecurityGroupIds:
+                    - !GetAtt MyRedisSG.GroupId
+                CacheSubnetGroupName: !Ref MyRedisSubnetGroup
+
+        # --------------------------------------------------------------------------------
+        # 10. DynamoDB Table
+        # --------------------------------------------------------------------------------
         FusionadosHistoryTable:
             Type: AWS::DynamoDB::Table
             Properties:
@@ -82,13 +313,18 @@ resources:
                     - AttributeName: SK
                       KeyType: RANGE
 
+    Outputs:
+        RedisEndpoint:
+            Description: 'Endpoint of the Redis cache'
+            Value: !GetAtt MyRedisCache.RedisEndpoint.Address
+
 custom:
     dynamodb:
         stages:
             - dev
         start:
             host: localhost
-            port: 8000 # Asegúrate de usar el puerto donde tu Docker corre DynamoDB
+            port: 8000
             noStart: true
             migrate: true
 

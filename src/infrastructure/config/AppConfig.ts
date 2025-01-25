@@ -6,15 +6,19 @@ export class AppConfig implements IAppConfig {
 	NASA_APOD_URL: string;
 	SWAPI_PEOPLE_URL: string;
 	HISTORY_TABLE: string;
-	IS_OFFLINE: string;
-	AWS_REGION: string;
+	IS_OFFLINE: boolean;
+	REGION: string;
+	REDIS_HOST: string;
+	REDIS_PORT: string;
 
 	constructor() {
 		this.NASA_API_KEY = process.env.NASA_API_KEY || '';
 		this.NASA_APOD_URL = process.env.NASA_APOD_URL || '';
 		this.SWAPI_PEOPLE_URL = process.env.SWAPI_PEOPLE_URL || '';
 		this.HISTORY_TABLE = process.env.HISTORY_TABLE || '';
-		this.IS_OFFLINE = process.env.IS_OFFLINE || 'true';
-		this.AWS_REGION = process.env.AWS_REGION || 'us-east-2';
+		this.IS_OFFLINE = process.env.IS_OFFLINE === 'true';
+		this.REGION = process.env.REGION || 'us-east-2';
+		this.REDIS_HOST = process.env.REDIS_HOST || 'localhost';
+		this.REDIS_PORT = process.env.REDIS_PORT || '6379';
 	}
 }

@@ -18,8 +18,10 @@ export class HistoryRepository implements IHistoryRepository {
 
 	constructor(@inject('AppConfig') private config: IAppConfig) {
 		const client = new DynamoDBClient({
-			region: this.config.AWS_REGION,
-			endpoint: this.config.IS_OFFLINE && 'http://localhost:8000',
+			region: this.config.REGION,
+			endpoint: this.config.IS_OFFLINE
+				? 'http://localhost:8000'
+				: undefined,
 		});
 		this.docClient = DynamoDBDocumentClient.from(client);
 		this.tableName = this.config.HISTORY_TABLE;
