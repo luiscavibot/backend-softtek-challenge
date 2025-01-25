@@ -1,32 +1,37 @@
+// src/infrastructure/di/container.ts
 import 'reflect-metadata';
-import * as dotenv from 'dotenv';
-
 import { container } from 'tsyringe';
 
 import { IAppConfig } from '../../domain/config/IAppConfig';
 import { AppConfig } from '../config/AppConfig';
 
-import { INasaApodRepository } from '../../domain/repositories/INasaApodRepository';
-import { NasaApodRepository } from '../repositories/NasaApodRepository';
-
 import { ISwapiPeopleRepository } from '../../domain/repositories/ISwapiPeopleRepository';
 import { SwapiPeopleRepository } from '../repositories/SwapiPeopleRepository';
 
-// 1) Registro de AppConfig como "AppConfig"
+import { INasaApodRepository } from '../../domain/repositories/INasaApodRepository';
+import { NasaApodRepository } from '../repositories/NasaApodRepository';
+
+import { IHistoryRepository } from '../../domain/repositories/IHistoryRepository';
+import { HistoryRepository } from '../repositories/HistoryRepository';
+
+// Config
 container.register<IAppConfig>('AppConfig', {
 	useClass: AppConfig,
 });
 
-// 2) NASA
-container.register<INasaApodRepository>('NasaApodRepository', {
-	useClass: NasaApodRepository,
-});
-
-// 3) SWAPI
+// Repos SWAPI
 container.register<ISwapiPeopleRepository>('SwapiPeopleRepository', {
 	useClass: SwapiPeopleRepository,
 });
 
-// 4) Otras dependencias (UserRepository, etc.)
-// ...
+// Repos NASA
+container.register<INasaApodRepository>('NasaApodRepository', {
+	useClass: NasaApodRepository,
+});
+
+// Historial
+container.register<IHistoryRepository>('HistoryRepository', {
+	useClass: HistoryRepository,
+});
+
 export { container };

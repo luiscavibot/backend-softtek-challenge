@@ -4,12 +4,27 @@ frameworkVersion: '4'
 provider:
     name: aws
     runtime: nodejs20.x
-    region: us-east-1
+    region: us-east-2
     stage: ${opt:stage, 'dev'}
+
     environment:
         NASA_API_KEY: ${env:NASA_API_KEY_${opt:stage, 'dev'}}
         NASA_APOD_URL: ${env:NASA_APOD_URL_${opt:stage, 'dev'}}
         SWAPI_PEOPLE_URL: ${env:SWAPI_PEOPLE_URL_${opt:stage, 'dev'}}
+        HISTORY_TABLE: ${env:HISTORY_TABLE_${opt:stage, 'dev'}}
+
+    iam:
+        role:
+            statements:
+                - Effect: Allow
+                  Action:
+                      - dynamodb:PutItem
+                      - dynamodb:GetItem
+                      - dynamodb:Query
+                      - dynamodb:UpdateItem
+                      - dynamodb:DeleteItem
+                  Resource:
+                      - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.HISTORY_TABLE}'
 
 functions:
     # Ejemplo: Endpoints para Star Wars People
@@ -35,9 +50,34 @@ functions:
                   path: users
                   method: post
 
+    getHistory:
+        handler: src/interface/lambda/handlers/historyHandler.getHistoryHandler
+        events:
+            - http:
+                  path: historial
+                  method: get
+
 plugins:
     - serverless-offline
     - '@jimdo/serverless-dotenv'
+
+resources:
+    Resources:
+        FusionadosHistoryTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: ${self:provider.environment.HISTORY_TABLE}
+                BillingMode: PAY_PER_REQUEST
+                AttributeDefinitions:
+                    - AttributeName: PK
+                      AttributeType: S
+                    - AttributeName: SK
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: PK
+                      KeyType: HASH
+                    - AttributeName: SK
+                      KeyType: RANGE
 
 custom:
     esbuild:

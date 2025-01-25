@@ -1,8 +1,8 @@
 // src/interface/lambda/handlers/swapiPeopleHandler.ts
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { container } from '../../../infrastructure/di/container';
-import { plainToInstance } from 'class-transformer';
-import { PeopleWithApodDto } from '../../dto/PeopleWithApodDto';
+import { IHistoryRepository } from '../../../domain/repositories/IHistoryRepository';
+import { v4 as uuidv4 } from 'uuid'; // para generar un ID
 import { GetAllPeopleUseCase } from '../../../application/use-cases/GetAllPeopleUseCase';
 import { GetPersonByIdUseCase } from '../../../application/use-cases/GetPersonByIdUseCase';
 
@@ -11,22 +11,24 @@ export const getPeopleHandler = async (
 ): Promise<APIGatewayProxyResult> => {
 	try {
 		const useCase = container.resolve(GetAllPeopleUseCase);
-		// 1. Obtener objetos raw (domain) del caso de uso
-		const peopleWithApod = await useCase.execute();
+		const data = await useCase.execute();
+		console.log('data-->', data);
 
-		// 2. Transformar a un array de DTO
-		//    Suponiendo que peopleWithApod es un array de objetos
-		const dtoArray = plainToInstance(PeopleWithApodDto, peopleWithApod, {
-			excludeExtraneousValues: false,
-			// excludeExtraneousValues: true => sólo usar campos con @Expose()
-			// depende de si quieres descartar campos no marcados con @Expose()
+		// Guardar en historial
+		const historyRepo =
+			container.resolve<IHistoryRepository>('HistoryRepository');
+		await historyRepo.saveRecord({
+			id: uuidv4(),
+			endpoint: '/fusionados/people',
+			timestamp: new Date().toISOString(),
+			responseData: data,
 		});
 
 		return {
 			statusCode: 200,
 			body: JSON.stringify({
 				message: 'List of SW characters with random APOD',
-				data: dtoArray, // enviamos ya transformados
+				data,
 			}),
 		};
 	} catch (error: any) {
@@ -50,18 +52,23 @@ export const getPersonByIdHandler = async (
 		}
 
 		const useCase = container.resolve(GetPersonByIdUseCase);
-		const personWithApod = await useCase.execute(id);
+		const data = await useCase.execute(id);
 
-		// Transformamos a un objeto DTO
-		const dto = plainToInstance(PeopleWithApodDto, personWithApod, {
-			excludeExtraneousValues: false,
+		// Guardar en historial
+		const historyRepo =
+			container.resolve<IHistoryRepository>('HistoryRepository');
+		await historyRepo.saveRecord({
+			id: uuidv4(),
+			endpoint: `/fusionados/people/${id}`,
+			timestamp: new Date().toISOString(),
+			responseData: data,
 		});
 
 		return {
 			statusCode: 200,
 			body: JSON.stringify({
 				message: `Character ${id} with random APOD`,
-				data: dto,
+				data,
 			}),
 		};
 	} catch (error: any) {
