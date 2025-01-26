@@ -2,10 +2,11 @@ import { inject, injectable } from 'tsyringe';
 import { ISwapiPeopleRepository } from '../../domain/repositories/ISwapiPeopleRepository';
 import { INasaApodRepository } from '../../domain/repositories/INasaApodRepository';
 import { ICacheRepository } from '../../domain/repositories/ICacheRepository';
+import { IAppConfig } from '../../domain/config/IAppConfig';
 
 @injectable()
 export class GetPersonByIdUseCase {
-	private cacheTtlSeconds = 30 * 60; // 30 minutos
+	private cacheTtlSeconds;
 
 	constructor(
 		@inject('SwapiPeopleRepository')
@@ -15,15 +16,19 @@ export class GetPersonByIdUseCase {
 		private readonly nasaRepo: INasaApodRepository,
 
 		@inject('CacheRepository')
-		private readonly cacheRepo: ICacheRepository
-	) {}
+		private readonly cacheRepo: ICacheRepository,
+
+		@inject('AppConfig')
+		private readonly appConfig: IAppConfig
+	) {
+		this.cacheTtlSeconds = this.appConfig.CACHE_TTL_SECONDS;
+	}
 
 	public async execute(id: string): Promise<any> {
 		if (!id) {
 			throw new Error('ID de personaje no proporcionado.');
 		}
 
-		// 1) Chequear cache
 		const cacheKey = `fusionados-people-${id}`;
 		const cached = await this.cacheRepo.getValue<any>(cacheKey);
 		if (cached) {
@@ -31,14 +36,11 @@ export class GetPersonByIdUseCase {
 			return cached;
 		}
 
-		// 2) Llamar SWAPI
 		const person = await this.swapiRepo.getPersonById(id);
 
-		// 3) Llamar NASA
 		const apodData = await this.nasaRepo.getRandomApod();
 		const finalResult = { ...person, randomGalaxyPhoto: apodData };
 
-		// 4) Guardar en cache
 		await this.cacheRepo.setValue<any>(
 			cacheKey,
 			finalResult,

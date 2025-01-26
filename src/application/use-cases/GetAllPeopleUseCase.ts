@@ -3,10 +3,11 @@ import { ISwapiPeopleRepository } from '../../domain/repositories/ISwapiPeopleRe
 import { INasaApodRepository } from '../../domain/repositories/INasaApodRepository';
 import { SWPerson } from '../../domain/entities/SWPerson';
 import { ICacheRepository } from '../../domain/repositories/ICacheRepository';
+import { IAppConfig } from '../../domain/config/IAppConfig';
 
 @injectable()
 export class GetAllPeopleUseCase {
-	private cacheTtlSeconds = 30 * 60;
+	private cacheTtlSeconds;
 
 	constructor(
 		@inject('SwapiPeopleRepository')
@@ -16,8 +17,13 @@ export class GetAllPeopleUseCase {
 		private readonly nasaRepo: INasaApodRepository,
 
 		@inject('CacheRepository')
-		private readonly cacheRepo: ICacheRepository
-	) {}
+		private readonly cacheRepo: ICacheRepository,
+
+		@inject('AppConfig')
+		private readonly appConfig: IAppConfig
+	) {
+		this.cacheTtlSeconds = this.appConfig.CACHE_TTL_SECONDS;
+	}
 
 	public async execute(): Promise<any[]> {
 		const cacheKey = 'fusionados-people';

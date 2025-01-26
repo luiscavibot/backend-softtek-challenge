@@ -1,7 +1,6 @@
 import { ICacheRepository } from '../../domain/repositories/ICacheRepository';
 import { injectable, inject } from 'tsyringe';
 import { Redis } from 'ioredis';
-import { IAppConfig } from '../../domain/config/IAppConfig';
 import { RedisConnectiontSingleton } from '../db/RedisConnectiontSingleton';
 
 @injectable()

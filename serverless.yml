@@ -25,6 +25,7 @@ provider:
         REDIS_HOST: 'fusionados-redis-prod.wizndr.0001.use2.cache.amazonaws.com'
         REDIS_PORT: '6379'
         DYNAMODB_LOCAL_SERVER: 'http://localhost:8000'
+        CACHE_TTL_SECONDS: ${env:CACHE_TTL_SECONDS_${opt:stage, 1800}}
 
     iam:
         role:

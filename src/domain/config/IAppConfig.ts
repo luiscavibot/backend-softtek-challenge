@@ -9,4 +9,5 @@ export interface IAppConfig {
 	REDIS_PORT: string;
 	STARWARS_PLANETS_TABLE: string;
 	DYNAMODB_LOCAL_SERVER: string;
+	CACHE_TTL_SECONDS: number;
 }
