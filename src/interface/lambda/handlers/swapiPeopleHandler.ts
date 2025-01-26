@@ -24,6 +24,11 @@ export const getPeopleHandler = async (
 
 		return {
 			statusCode: 200,
+			headers: {
+				'Access-Control-Allow-Origin': '*',
+				'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+				'Access-Control-Allow-Methods': 'OPTIONS,GET',
+			},
 			body: JSON.stringify({
 				message: 'List of SW characters with random APOD',
 				data,
@@ -64,6 +69,11 @@ export const getPersonByIdHandler = async (
 
 		return {
 			statusCode: 200,
+			headers: {
+				'Access-Control-Allow-Origin': '*',
+				'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+				'Access-Control-Allow-Methods': 'OPTIONS,GET,POST,PUT,DELETE',
+			},
 			body: JSON.stringify({
 				message: `Character ${id} with random APOD`,
 				data,
