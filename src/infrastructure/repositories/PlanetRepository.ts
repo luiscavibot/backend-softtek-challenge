@@ -3,7 +3,7 @@ import { Planet } from '../../domain/entities/Planet';
 import { PutCommand } from '@aws-sdk/lib-dynamodb';
 import { inject, injectable } from 'tsyringe';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
-import { DynamoDBClientSingleton } from '../db/DynamoDBClientSingleton';
+import { DynamoDBConnectiontSingleton } from '../db/DynamoDBConnectiontSingleton';
 
 @injectable()
 export class PlanetRepository implements IPlanetRepository {
@@ -11,7 +11,7 @@ export class PlanetRepository implements IPlanetRepository {
 
 	constructor(
 		@inject('DynamoDBClientSingleton')
-		private dynamoClient: DynamoDBClientSingleton
+		private dynamoConn: DynamoDBConnectiontSingleton
 	) {
 		this.tableName =
 			process.env.STARWARS_PLANETS_TABLE || 'StarWarsPlanets';
@@ -24,7 +24,7 @@ export class PlanetRepository implements IPlanetRepository {
 			...planet,
 		};
 
-		await this.dynamoClient.getClient().send(
+		await this.dynamoConn.client.send(
 			new PutCommand({
 				TableName: this.tableName,
 				Item: item,
@@ -34,7 +34,7 @@ export class PlanetRepository implements IPlanetRepository {
 		return planet;
 	}
 	public async getAllPlanets(): Promise<Planet[]> {
-		const result = await this.dynamoClient.getClient().send(
+		const result = await this.dynamoConn.client.send(
 			new ScanCommand({
 				TableName: this.tableName,
 			})

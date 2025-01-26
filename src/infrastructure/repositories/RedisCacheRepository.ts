@@ -1,18 +1,13 @@
-// src/infrastructure/repositories/RedisCacheRepository.ts
 import { ICacheRepository } from '../../domain/repositories/ICacheRepository';
 import { injectable, inject } from 'tsyringe';
 import IORedis, { Redis } from 'ioredis';
 import { IAppConfig } from '../../domain/config/IAppConfig';
 
-/**
- * Implementación de caché usando Redis (ElastiCache)
- */
 @injectable()
 export class RedisCacheRepository implements ICacheRepository {
 	private redisClient: Redis;
 
 	constructor(@inject('AppConfig') private config: IAppConfig) {
-		// config.REDIS_HOST debería provenir de env, pipeline, etc.
 		const host =
 			process.env.REDIS_HOST || this.config.REDIS_HOST || 'localhost';
 		const port = parseInt(
@@ -20,12 +15,9 @@ export class RedisCacheRepository implements ICacheRepository {
 			10
 		);
 
-		// ioredis require host + port (o TLS si es un cluster con auth)
 		this.redisClient = new IORedis({
 			host,
 			port,
-			// password: ... si tu cluster requiere auth
-			// TLS config, etc.
 		});
 	}
 

@@ -11,15 +11,12 @@ export class NasaApodRepository implements INasaApodRepository {
 	constructor(@inject('AppConfig') private readonly config: IAppConfig) {}
 
 	public async getRandomApod(): Promise<ApodData> {
-		// 1. Generar la fecha aleatoria
 		const randomDate = this.getRandomDate(START_DATE, END_DATE);
 
-		// 2. Construir la URL
 		const url = new URL(this.config.NASA_APOD_URL);
 		url.searchParams.append('api_key', this.config.NASA_API_KEY);
 		url.searchParams.append('date', randomDate);
 
-		// 3. Llamada HTTP
 		const response = await fetch(url.toString());
 		if (!response.ok) {
 			throw new Error(`Error fetching NASA APOD: ${response.statusText}`);

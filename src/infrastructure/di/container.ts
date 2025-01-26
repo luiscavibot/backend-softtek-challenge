@@ -18,16 +18,16 @@ import { RedisCacheRepository } from '../repositories/RedisCacheRepository';
 import { NoOpCacheRepository } from '../repositories/NoOpCacheRepository';
 import { IPlanetRepository } from '../../domain/repositories/IPlanetRepository';
 import { PlanetRepository } from '../repositories/PlanetRepository';
-import { DynamoDBClientSingleton } from '../db/DynamoDBClientSingleton';
+import { DynamoDBConnectiontSingleton } from '../db/DynamoDBConnectiontSingleton';
 import { CreatePlanetUseCase } from '../../application/use-cases/CreatePlanetUseCase';
 
 container.register<IAppConfig>('AppConfig', {
 	useClass: AppConfig,
 });
 
-container.registerSingleton<DynamoDBClientSingleton>(
-	'DynamoDBClientSingleton',
-	DynamoDBClientSingleton
+container.registerSingleton<DynamoDBConnectiontSingleton>(
+	'DynamoDBConnectiontSingleton',
+	DynamoDBConnectiontSingleton
 );
 
 container.register<IPlanetRepository>('PlanetRepository', {

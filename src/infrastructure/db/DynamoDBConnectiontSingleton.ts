@@ -5,7 +5,7 @@ import { inject, singleton } from 'tsyringe';
 import { IAppConfig } from '../../domain/config/IAppConfig';
 
 @singleton()
-export class DynamoDBClientSingleton {
+export class DynamoDBConnectiontSingleton {
 	private readonly docClient: DynamoDBDocumentClient;
 
 	constructor(@inject('AppConfig') private config: IAppConfig) {
@@ -19,7 +19,7 @@ export class DynamoDBClientSingleton {
 		this.docClient = DynamoDBDocumentClient.from(client);
 	}
 
-	public getClient(): DynamoDBDocumentClient {
+	get client(): DynamoDBDocumentClient {
 		return this.docClient;
 	}
 }

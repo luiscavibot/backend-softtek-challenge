@@ -13,7 +13,6 @@ export const getPeopleHandler = async (
 		const useCase = container.resolve(GetAllPeopleUseCase);
 		const data = await useCase.execute();
 
-		// Guardar en historial
 		const historyRepo =
 			container.resolve<IHistoryRepository>('HistoryRepository');
 		await historyRepo.saveRecord({

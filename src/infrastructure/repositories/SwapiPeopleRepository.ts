@@ -8,17 +8,13 @@ export class SwapiPeopleRepository implements ISwapiPeopleRepository {
 	constructor(@inject('AppConfig') private readonly config: IAppConfig) {}
 
 	async getAllPeople(): Promise<SWPerson[]> {
-		console.log('Llamando SWAPI para obtener lista de personajes...');
 		const response = await fetch(`${this.config.SWAPI_PEOPLE_URL}/`);
-		console.log('Respuesta de SWAPI recibida');
 		if (!response.ok) {
 			throw new Error(`Error fetching people: ${response.status}`);
 		}
 
 		const data = await response.json();
-		// SWAPI retorna { count, next, previous, results: [] }
-		// Nos interesan solo results (arreglo de personajes).
-		return data.results; // Array de SWPerson (estructura de la SWAPI)
+		return data.results;
 	}
 
 	async getPersonById(id: string): Promise<SWPerson> {
@@ -30,6 +26,6 @@ export class SwapiPeopleRepository implements ISwapiPeopleRepository {
 		}
 
 		const person = await response.json();
-		return person; // SWPerson
+		return person;
 	}
 }
