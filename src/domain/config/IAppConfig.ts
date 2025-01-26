@@ -7,4 +7,5 @@ export interface IAppConfig {
 	REGION: string;
 	REDIS_HOST: string;
 	REDIS_PORT: string;
+	STARWARS_PLANETS_TABLE: string;
 }

@@ -10,6 +10,7 @@ export class AppConfig implements IAppConfig {
 	REGION: string;
 	REDIS_HOST: string;
 	REDIS_PORT: string;
+	STARWARS_PLANETS_TABLE: string;
 
 	constructor() {
 		this.NASA_API_KEY = process.env.NASA_API_KEY || '';
@@ -20,5 +21,6 @@ export class AppConfig implements IAppConfig {
 		this.REGION = process.env.REGION || 'us-east-2';
 		this.REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 		this.REDIS_PORT = process.env.REDIS_PORT || '6379';
+		this.STARWARS_PLANETS_TABLE = process.env.STARWARS_PLANETS_TABLE || '';
 	}
 }

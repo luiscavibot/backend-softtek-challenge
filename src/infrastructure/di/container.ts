@@ -16,31 +16,32 @@ import { HistoryRepository } from '../repositories/HistoryRepository';
 import { ICacheRepository } from '../../domain/repositories/ICacheRepository';
 import { RedisCacheRepository } from '../repositories/RedisCacheRepository';
 import { NoOpCacheRepository } from '../repositories/NoOpCacheRepository';
+import { IPlanetRepository } from '../../domain/repositories/IPlanetRepository';
+import { PlanetRepository } from '../repositories/PlanetRepository';
 
-// 1) Config
 container.register<IAppConfig>('AppConfig', {
 	useClass: AppConfig,
 });
 
-// 2) Repos SWAPI
 container.register<ISwapiPeopleRepository>('SwapiPeopleRepository', {
 	useClass: SwapiPeopleRepository,
 });
 
-// 3) Repos NASA
 container.register<INasaApodRepository>('NasaApodRepository', {
 	useClass: NasaApodRepository,
 });
 
-// 4) Historial
 container.register<IHistoryRepository>('HistoryRepository', {
 	useClass: HistoryRepository,
 });
 
-// 5) Cache: si IS_OFFLINE=true => NoOp, si no => Redis
 const isOffline = process.env.IS_OFFLINE === 'true';
 container.register<ICacheRepository>('CacheRepository', {
 	useClass: isOffline ? NoOpCacheRepository : RedisCacheRepository,
+});
+
+container.register<IPlanetRepository>('PlanetRepository', {
+	useClass: PlanetRepository,
 });
 
 export { container };
