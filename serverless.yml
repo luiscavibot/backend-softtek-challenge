@@ -55,13 +55,6 @@ functions:
                   path: fusionados/people/{id}
                   method: get
 
-    createUser:
-        handler: src/interface/lambda/handlers/userHandler.createUserHandler
-        events:
-            - http:
-                  path: users
-                  method: post
-
     getHistory:
         handler: src/interface/lambda/handlers/historyHandler.getHistoryHandler
         events:
