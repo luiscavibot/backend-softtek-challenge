@@ -10,7 +10,6 @@ describe('Integration - GET /historial', () => {
 		expect(response.body).toHaveProperty('data');
 		const data = response.body.data;
 
-		// Asumimos que data es un array con la info guardada en Dynamo (historial)
 		expect(Array.isArray(data)).toBe(true);
 	});
 

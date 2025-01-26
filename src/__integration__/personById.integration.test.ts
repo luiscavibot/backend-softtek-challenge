@@ -4,7 +4,6 @@ describe('Integration - GET /fusionados/people/:id', () => {
 	const baseUrl = 'http://localhost:3000/dev';
 
 	it('should return 200 and a single SW character with random APOD', async () => {
-		// Ejemplo: pedir ID 1
 		const response = await request(baseUrl)
 			.get('/fusionados/people/1')
 			.expect(200);
