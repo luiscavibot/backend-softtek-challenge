@@ -24,6 +24,7 @@ provider:
         STARWARS_PLANETS_TABLE: ${env:STARWARS_PLANETS_TABLE_${opt:stage, 'dev'}}
         REDIS_HOST: 'fusionados-redis-prod.wizndr.0001.use2.cache.amazonaws.com'
         REDIS_PORT: '6379'
+        DYNAMODB_LOCAL_SERVER: 'http://localhost:8000'
 
     iam:
         role:

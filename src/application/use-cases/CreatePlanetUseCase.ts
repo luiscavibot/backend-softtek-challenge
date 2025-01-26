@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { inject, injectable } from 'tsyringe';
 import { IPlanetRepository } from '../../domain/repositories/IPlanetRepository';
 import { Planet } from '../../domain/entities/Planet';

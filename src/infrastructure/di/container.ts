@@ -18,9 +18,24 @@ import { RedisCacheRepository } from '../repositories/RedisCacheRepository';
 import { NoOpCacheRepository } from '../repositories/NoOpCacheRepository';
 import { IPlanetRepository } from '../../domain/repositories/IPlanetRepository';
 import { PlanetRepository } from '../repositories/PlanetRepository';
+import { DynamoDBClientSingleton } from '../db/DynamoDBClientSingleton';
+import { CreatePlanetUseCase } from '../../application/use-cases/CreatePlanetUseCase';
 
 container.register<IAppConfig>('AppConfig', {
 	useClass: AppConfig,
+});
+
+container.registerSingleton<DynamoDBClientSingleton>(
+	'DynamoDBClientSingleton',
+	DynamoDBClientSingleton
+);
+
+container.register<IPlanetRepository>('PlanetRepository', {
+	useClass: PlanetRepository,
+});
+
+container.register('CreatePlanetUseCase', {
+	useClass: CreatePlanetUseCase,
 });
 
 container.register<ISwapiPeopleRepository>('SwapiPeopleRepository', {
@@ -38,10 +53,6 @@ container.register<IHistoryRepository>('HistoryRepository', {
 const isOffline = process.env.IS_OFFLINE === 'true';
 container.register<ICacheRepository>('CacheRepository', {
 	useClass: isOffline ? NoOpCacheRepository : RedisCacheRepository,
-});
-
-container.register<IPlanetRepository>('PlanetRepository', {
-	useClass: PlanetRepository,
 });
 
 export { container };

@@ -8,4 +8,5 @@ export interface IAppConfig {
 	REDIS_HOST: string;
 	REDIS_PORT: string;
 	STARWARS_PLANETS_TABLE: string;
+	DYNAMODB_LOCAL_SERVER: string;
 }

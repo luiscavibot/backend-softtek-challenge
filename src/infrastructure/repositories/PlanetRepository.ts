@@ -1,24 +1,20 @@
 import { IPlanetRepository } from '../../domain/repositories/IPlanetRepository';
 import { Planet } from '../../domain/entities/Planet';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
+import { PutCommand } from '@aws-sdk/lib-dynamodb';
 import { inject, injectable } from 'tsyringe';
-import { IAppConfig } from '../../domain/config/IAppConfig';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBClientSingleton } from '../db/DynamoDBClientSingleton';
 
 @injectable()
 export class PlanetRepository implements IPlanetRepository {
-	private docClient: DynamoDBDocumentClient;
 	private tableName: string;
 
-	constructor(@inject('AppConfig') private config: IAppConfig) {
-		const client = new DynamoDBClient({
-			region: process.env.AWS_REGION || 'us-east-2',
-		});
-		this.docClient = DynamoDBDocumentClient.from(client);
-
-		this.tableName = this.config.STARWARS_PLANETS_TABLE;
-		console.log('tableName---->', this.tableName);
+	constructor(
+		@inject('DynamoDBClientSingleton')
+		private dynamoClient: DynamoDBClientSingleton
+	) {
+		this.tableName =
+			process.env.STARWARS_PLANETS_TABLE || 'StarWarsPlanets';
 	}
 
 	public async createPlanet(planet: Planet): Promise<Planet> {
@@ -28,7 +24,7 @@ export class PlanetRepository implements IPlanetRepository {
 			...planet,
 		};
 
-		await this.docClient.send(
+		await this.dynamoClient.getClient().send(
 			new PutCommand({
 				TableName: this.tableName,
 				Item: item,
@@ -38,7 +34,7 @@ export class PlanetRepository implements IPlanetRepository {
 		return planet;
 	}
 	public async getAllPlanets(): Promise<Planet[]> {
-		const result = await this.docClient.send(
+		const result = await this.dynamoClient.getClient().send(
 			new ScanCommand({
 				TableName: this.tableName,
 			})
@@ -46,14 +42,12 @@ export class PlanetRepository implements IPlanetRepository {
 
 		if (!result.Items) return [];
 
-		const planets = result.Items.map((item) => ({
-			id: item.id,
+		return result.Items.map((item) => ({
+			id: item.PK.replace('PLANET#', ''),
 			name: item.name,
 			climate: item.climate,
 			terrain: item.terrain,
 			population: item.population,
 		})) as Planet[];
-
-		return planets;
 	}
 }

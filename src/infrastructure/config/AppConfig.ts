@@ -11,6 +11,7 @@ export class AppConfig implements IAppConfig {
 	REDIS_HOST: string;
 	REDIS_PORT: string;
 	STARWARS_PLANETS_TABLE: string;
+	DYNAMODB_LOCAL_SERVER: string;
 
 	constructor() {
 		this.NASA_API_KEY = process.env.NASA_API_KEY || '';
@@ -22,5 +23,7 @@ export class AppConfig implements IAppConfig {
 		this.REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 		this.REDIS_PORT = process.env.REDIS_PORT || '6379';
 		this.STARWARS_PLANETS_TABLE = process.env.STARWARS_PLANETS_TABLE || '';
+		this.DYNAMODB_LOCAL_SERVER =
+			process.env.DYNAMODB_LOCAL_SERVER || 'http://localhost:8000';
 	}
 }
