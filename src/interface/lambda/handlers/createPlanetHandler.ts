@@ -1,5 +1,9 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { container } from '../../../infrastructure/di/container';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { CreatePlanetDto } from '../../dto/CreatePlanetDto';
+import { PlanetDto } from '../../dto/PlanetDto';
 import { CreatePlanetUseCase } from '../../../application/use-cases/CreatePlanetUseCase';
 
 export const createPlanetHandler = async (
@@ -13,21 +17,37 @@ export const createPlanetHandler = async (
 			};
 		}
 
-		const { name, climate, terrain, population } = JSON.parse(event.body);
+		const bodyObj = JSON.parse(event.body);
+		const createDto = plainToInstance(CreatePlanetDto, bodyObj);
+
+		const errors = await validate(createDto);
+		if (errors.length > 0) {
+			return {
+				statusCode: 400,
+				body: JSON.stringify({
+					error: 'Validation failed',
+					details: errors.map((e) => e.constraints),
+				}),
+			};
+		}
 
 		const useCase = container.resolve(CreatePlanetUseCase);
 		const planet = await useCase.execute({
-			name,
-			climate,
-			terrain,
-			population,
+			name: createDto.name,
+			climate: createDto.climate,
+			terrain: createDto.terrain,
+			population: createDto.population,
+		});
+
+		const responseDto = plainToInstance(PlanetDto, planet, {
+			excludeExtraneousValues: true,
 		});
 
 		return {
 			statusCode: 200,
 			body: JSON.stringify({
 				message: 'Planet created successfully',
-				data: planet,
+				data: responseDto,
 			}),
 		};
 	} catch (error: any) {

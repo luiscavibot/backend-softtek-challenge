@@ -66,6 +66,12 @@ functions:
             - http:
                   path: starwars/planets
                   method: post
+    getAllPlanets:
+        handler: src/interface/lambda/handlers/getAllPlanetsHandler.getAllPlanetsHandler
+        events:
+            - http:
+                  path: starwars/planets
+                  method: get
 
 plugins:
     - serverless-offline

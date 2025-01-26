@@ -4,6 +4,7 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { inject, injectable } from 'tsyringe';
 import { IAppConfig } from '../../domain/config/IAppConfig';
+import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 
 @injectable()
 export class PlanetRepository implements IPlanetRepository {
@@ -16,10 +17,8 @@ export class PlanetRepository implements IPlanetRepository {
 		});
 		this.docClient = DynamoDBDocumentClient.from(client);
 
-		this.tableName =
-			process.env.STARWARS_PLANETS_TABLE ||
-			this.config.STARWARS_PLANETS_TABLE ||
-			'StarWarsPlanets';
+		this.tableName = this.config.STARWARS_PLANETS_TABLE;
+		console.log('tableName---->', this.tableName);
 	}
 
 	public async createPlanet(planet: Planet): Promise<Planet> {
@@ -37,5 +36,24 @@ export class PlanetRepository implements IPlanetRepository {
 		);
 
 		return planet;
+	}
+	public async getAllPlanets(): Promise<Planet[]> {
+		const result = await this.docClient.send(
+			new ScanCommand({
+				TableName: this.tableName,
+			})
+		);
+
+		if (!result.Items) return [];
+
+		const planets = result.Items.map((item) => ({
+			id: item.id,
+			name: item.name,
+			climate: item.climate,
+			terrain: item.terrain,
+			population: item.population,
+		})) as Planet[];
+
+		return planets;
 	}
 }
