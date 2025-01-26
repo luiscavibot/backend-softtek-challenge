@@ -1,7 +1,3 @@
-/**
- * Entidad que describe la información básica de un personaje de Star Wars.
- * Puedes ajustarla según la estructura que necesites de SWAPI.
- */
 export interface SWPerson {
 	name: string;
 	height: string;
@@ -11,4 +7,12 @@ export interface SWPerson {
 	eye_color: string;
 	birth_year: string;
 	gender: string;
+	homeworld: string;
+	films: string[];
+	species: string[];
+	vehicles: string[];
+	starships: string[];
+	created: string;
+	edited: string;
+	url: string;
 }

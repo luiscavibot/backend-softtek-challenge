@@ -6,7 +6,10 @@ import {
 	QueryCommand,
 } from '@aws-sdk/lib-dynamodb';
 
-import { IHistoryRepository } from '../../domain/repositories/IHistoryRepository';
+import {
+	IHistoryRepository,
+	LastKey,
+} from '../../domain/repositories/IHistoryRepository';
 import { HistoryRecord } from '../../domain/entities/HistoryRecord';
 import { inject, injectable } from 'tsyringe';
 import { IAppConfig } from '../../domain/config/IAppConfig';
@@ -51,7 +54,7 @@ export class HistoryRepository implements IHistoryRepository {
 	public async getRecords(
 		limit: number,
 		lastKey?: any
-	): Promise<{ items: HistoryRecord[]; lastKey?: any }> {
+	): Promise<{ items: HistoryRecord[]; lastKey?: LastKey }> {
 		const queryParams = {
 			TableName: this.tableName,
 			KeyConditionExpression: 'PK = :pk',
