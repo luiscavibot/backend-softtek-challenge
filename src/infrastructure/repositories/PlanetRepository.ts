@@ -4,17 +4,18 @@ import { PutCommand } from '@aws-sdk/lib-dynamodb';
 import { inject, injectable } from 'tsyringe';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { DynamoDBConnectiontSingleton } from '../db/DynamoDBConnectiontSingleton';
+import { IAppConfig } from '../../domain/config/IAppConfig';
 
 @injectable()
 export class PlanetRepository implements IPlanetRepository {
 	private tableName: string;
 
 	constructor(
-		@inject('DynamoDBClientSingleton')
+		@inject('AppConfig') private config: IAppConfig,
+		@inject('DynamoDBConnectiontSingleton')
 		private dynamoConn: DynamoDBConnectiontSingleton
 	) {
-		this.tableName =
-			process.env.STARWARS_PLANETS_TABLE || 'StarWarsPlanets';
+		this.tableName = this.config.STARWARS_PLANETS_TABLE;
 	}
 
 	public async createPlanet(planet: Planet): Promise<Planet> {

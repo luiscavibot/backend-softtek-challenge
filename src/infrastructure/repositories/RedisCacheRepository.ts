@@ -8,12 +8,8 @@ export class RedisCacheRepository implements ICacheRepository {
 	private redisClient: Redis;
 
 	constructor(@inject('AppConfig') private config: IAppConfig) {
-		const host =
-			process.env.REDIS_HOST || this.config.REDIS_HOST || 'localhost';
-		const port = parseInt(
-			process.env.REDIS_PORT || this.config.REDIS_PORT || '6379',
-			10
-		);
+		const host = this.config.REDIS_HOST;
+		const port = parseInt(this.config.REDIS_PORT, 10);
 
 		this.redisClient = new IORedis({
 			host,

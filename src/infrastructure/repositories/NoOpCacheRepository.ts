@@ -10,7 +10,5 @@ export class NoOpCacheRepository implements ICacheRepository {
 		key: string,
 		value: T,
 		ttlSeconds: number
-	): Promise<void> {
-		// No hace nada
-	}
+	): Promise<void> {}
 }

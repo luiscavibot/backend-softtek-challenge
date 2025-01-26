@@ -38,7 +38,7 @@ provider:
                       - dynamodb:DeleteItem
                   Resource:
                       - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.HISTORY_TABLE}'
-                # Agrega más permisos si lo requieres
+                      - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.STARWARS_PLANETS_TABLE}'
 
 functions:
     getPeople:
