@@ -1,20 +1,18 @@
 import { ICacheRepository } from '../../domain/repositories/ICacheRepository';
 import { injectable, inject } from 'tsyringe';
-import IORedis, { Redis } from 'ioredis';
+import { Redis } from 'ioredis';
 import { IAppConfig } from '../../domain/config/IAppConfig';
+import { RedisConnectiontSingleton } from '../db/RedisConnectiontSingleton';
 
 @injectable()
 export class RedisCacheRepository implements ICacheRepository {
 	private redisClient: Redis;
 
-	constructor(@inject('AppConfig') private config: IAppConfig) {
-		const host = this.config.REDIS_HOST;
-		const port = parseInt(this.config.REDIS_PORT, 10);
-
-		this.redisClient = new IORedis({
-			host,
-			port,
-		});
+	constructor(
+		@inject('RedisConnectiontSingleton')
+		private redisConn: RedisConnectiontSingleton
+	) {
+		this.redisClient = this.redisConn.connection;
 	}
 
 	public async getValue<T>(key: string): Promise<T | null> {

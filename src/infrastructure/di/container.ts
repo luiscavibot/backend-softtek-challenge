@@ -20,6 +20,7 @@ import { IPlanetRepository } from '../../domain/repositories/IPlanetRepository';
 import { PlanetRepository } from '../repositories/PlanetRepository';
 import { DynamoDBConnectiontSingleton } from '../db/DynamoDBConnectiontSingleton';
 import { CreatePlanetUseCase } from '../../application/use-cases/CreatePlanetUseCase';
+import { RedisConnectiontSingleton } from '../db/RedisConnectiontSingleton';
 
 container.register<IAppConfig>('AppConfig', {
 	useClass: AppConfig,
@@ -28,6 +29,11 @@ container.register<IAppConfig>('AppConfig', {
 container.registerSingleton<DynamoDBConnectiontSingleton>(
 	'DynamoDBConnectiontSingleton',
 	DynamoDBConnectiontSingleton
+);
+
+container.registerSingleton<RedisConnectiontSingleton>(
+	'RedisConnectiontSingleton',
+	RedisConnectiontSingleton
 );
 
 container.register<IPlanetRepository>('PlanetRepository', {

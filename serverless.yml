@@ -36,6 +36,7 @@ provider:
                       - dynamodb:Query
                       - dynamodb:UpdateItem
                       - dynamodb:DeleteItem
+                      - dynamodb:Scan
                   Resource:
                       - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.HISTORY_TABLE}'
                       - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.STARWARS_PLANETS_TABLE}'
