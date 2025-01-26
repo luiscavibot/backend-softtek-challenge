@@ -49,6 +49,7 @@ functions:
             - http:
                   path: fusionados/people
                   method: get
+                  cors: true
 
     getPersonById:
         handler: src/interface/lambda/handlers/swapiPeopleHandler.getPersonByIdHandler
@@ -56,6 +57,7 @@ functions:
             - http:
                   path: fusionados/people/{id}
                   method: get
+                  cors: true
 
     getHistory:
         handler: src/interface/lambda/handlers/historyHandler.getHistoryHandler
@@ -63,18 +65,21 @@ functions:
             - http:
                   path: historial
                   method: get
+                  cors: true
     createPlanet:
         handler: src/interface/lambda/handlers/createPlanetHandler.createPlanetHandler
         events:
             - http:
                   path: starwars/planets
                   method: post
+                  cors: true
     getAllPlanets:
         handler: src/interface/lambda/handlers/getAllPlanetsHandler.getAllPlanetsHandler
         events:
             - http:
                   path: starwars/planets
                   method: get
+                  cors: true
 
 plugins:
     - serverless-offline

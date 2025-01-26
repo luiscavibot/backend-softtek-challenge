@@ -17,6 +17,11 @@ export const getAllPlanetsHandler = async (
 
 		return {
 			statusCode: 200,
+			headers: {
+				'Access-Control-Allow-Origin': '*',
+				'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+				'Access-Control-Allow-Methods': 'OPTIONS,GET',
+			},
 			body: JSON.stringify({
 				message: 'List of all planets',
 				data: responseDto,
