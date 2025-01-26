@@ -33,7 +33,6 @@ export class GetAllPeopleUseCase {
 			return cachedValue;
 		}
 
-		console.log('No se encontró caché, llamando SWAPI + NASA...');
 		const people = await this.swapiRepo.getAllPeople();
 
 		const resultsWithApod = await Promise.all(
