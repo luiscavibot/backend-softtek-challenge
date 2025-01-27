@@ -15,9 +15,14 @@ Este proyecto implementa una solución backend que aprovecha servicios de AWS y 
 5. **AWS ElastiCache con Redis:** Implementación de caching para mejorar tiempos de respuesta.
 6. **AWS X-Ray:** Rastreo avanzado para identificar cuellos de botella y errores.
 7. **Amazon Route 53:** Servicio DNS para registro de dominio personalizados: sofftek.digitalbonds.link .
-8. **Clean Architecture:** División clara de responsabilidades en capas, facilitando el mantenimiento.
-9. **Pruebas Unitarias e Integración:** Cobertura de funcionalidades clave del proyecto.
-10. **Patrones de Diseño:**
+8. **Red configurada con AWS:**
+   - **VPC personalizada:** Una red virtual aislada para la infraestructura del backend.
+   - **Subnets públicas y privadas:** Para segmentar y controlar el tráfico entre los recursos.
+   - **Internet Gateway y NAT Gateway:** Para gestionar el acceso a internet desde los recursos dentro de la VPC.
+   - **Security Groups:** Control de acceso detallado para las Lambdas y Redis.
+9. **Clean Architecture:** División clara de responsabilidades en capas, facilitando el mantenimiento.
+10. **Pruebas Unitarias e Integración:** Cobertura de funcionalidades clave del proyecto.
+11. **Patrones de Diseño:**
    - **DI Container:** Simplifica la gestión de dependencias.
    - **Decorador:** Facilita la extensión de funcionalidades.
    - **Singleton:** Garantiza únicas instancias globales donde sea necesario.
