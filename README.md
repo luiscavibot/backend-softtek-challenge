@@ -83,12 +83,6 @@ La documentación interactiva de la API está disponible a través de Swagger. C
 - **Serverless Framework:** Orquestación y despliegue de la infraestructura.
 - **Clean Architecture:** Organización del código en capas.
 
-## Próximos Pasos
-
-- **Mejoras en la Seguridad:** Implementar AWS WAF para proteger contra ataques maliciosos.
-- **Monitoreo Avanzado:** Integrar métricas detalladas con CloudWatch para identificar y resolver problemas.
-- **Optimizaciones de Rendimiento:** Ampliar el uso de caching y mejorar los tiempos de respuesta.
-- **Pruebas Adicionales:** Crear pruebas E2E para validar flujos completos.
 
 ## Contribuciones
 
