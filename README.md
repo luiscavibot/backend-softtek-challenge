@@ -50,11 +50,10 @@ backend-softtek-challenge/
 └── README.md              # Documentación del proyecto
 ```
 
-## Tecnologías Usadas
+## Otros tecnologías usadas
 
-- **AWS Services:** Cognito, API Gateway, Lambda, DynamoDB, ElastiCache (Redis), X-Ray.
 - **Node.js:** Lenguaje principal para el backend.
+- **Typescript:** Extensión de JS para tipado estático y otras funcionalidades adicionales.
 - **Swagger:** Generación y consulta de documentación interactiva de la API.
 - **Serverless Framework:** Orquestación y despliegue de la infraestructura.
-- **Clean Architecture:** Organización del código en capas.
 
