@@ -11,7 +11,6 @@ provider:
         lambda: true
         apiGateway: true
 
-    # Lambdas se ubican en las subnets privadas y usan SG de Lambda
     vpc:
         securityGroupIds:
             - Fn::GetAtt: [MyLambdaSG, GroupId]
@@ -31,6 +30,8 @@ provider:
         DYNAMODB_LOCAL_SERVER: 'http://localhost:8000'
         CACHE_TTL_SECONDS: ${env:CACHE_TTL_SECONDS_${opt:stage, 'dev'}}
         LOG_LEVEL: ${env:LOG_LEVEL_${opt:stage, 'dev'}}
+        COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID_${opt:stage, 'dev'}}
+        COGNITO_APP_CLIENT_ID: ${env:COGNITO_APP_CLIENT_ID_${opt:stage, 'dev'}}
 
     iam:
         role:
@@ -53,6 +54,11 @@ provider:
                       - xray:PutTelemetryRecords
                   Resource:
                       - 'arn:aws:xray:${self:provider.region}:${aws:accountId}:*'
+                - Effect: Allow
+                  Action:
+                      - cognito-idp:*
+                  Resource:
+                      - arn:aws:cognito-idp:${self:provider.region}:${aws:accountId}:userpool/${env:COGNITO_USER_POOL_ID_${opt:stage, 'dev'}}
 
 functions:
     getPeople:
@@ -78,6 +84,10 @@ functions:
                   path: historial
                   method: get
                   cors: true
+                  authorizer:
+                      type: COGNITO_USER_POOLS
+                      authorizerId:
+                          Ref: ApiGatewayAuthorizer
     createPlanet:
         handler: src/interface/lambda/handlers/createPlanetHandler.createPlanetHandler
         events:
@@ -85,6 +95,10 @@ functions:
                   path: starwars/planets
                   method: post
                   cors: true
+                  authorizer:
+                      type: COGNITO_USER_POOLS
+                      authorizerId:
+                          Ref: ApiGatewayAuthorizer
     getAllPlanets:
         handler: src/interface/lambda/handlers/getAllPlanetsHandler.getAllPlanetsHandler
         events:
@@ -100,9 +114,6 @@ plugins:
 
 resources:
     Resources:
-        # --------------------------------------------------------------------------------
-        # 1. VPC
-        # --------------------------------------------------------------------------------
         MyVPC:
             Type: AWS::EC2::VPC
             Properties:
@@ -113,9 +124,6 @@ resources:
                     - Key: Name
                       Value: 'myServerlessVPC-${self:provider.stage}'
 
-        # --------------------------------------------------------------------------------
-        # 2. Internet Gateway (para subnets públicas)
-        # --------------------------------------------------------------------------------
         MyInternetGateway:
             Type: AWS::EC2::InternetGateway
             Properties:
@@ -129,9 +137,6 @@ resources:
                 VpcId: !Ref MyVPC
                 InternetGatewayId: !Ref MyInternetGateway
 
-        # --------------------------------------------------------------------------------
-        # 3. Subnets Públicas
-        # --------------------------------------------------------------------------------
         MyPublicSubnet1:
             Type: AWS::EC2::Subnet
             Properties:
@@ -154,7 +159,6 @@ resources:
                     - Key: Name
                       Value: 'myPublicSubnet2-${self:provider.stage}'
 
-        # Route Table para subnets públicas
         MyPublicRouteTable:
             Type: AWS::EC2::RouteTable
             Properties:
@@ -170,7 +174,6 @@ resources:
                 DestinationCidrBlock: '0.0.0.0/0'
                 GatewayId: !Ref MyInternetGateway
 
-        # Asociaciones de route table con cada subnet pública
         MyPublicSubnet1RouteTableAssoc:
             Type: AWS::EC2::SubnetRouteTableAssociation
             Properties:
@@ -183,9 +186,6 @@ resources:
                 SubnetId: !Ref MyPublicSubnet2
                 RouteTableId: !Ref MyPublicRouteTable
 
-        # --------------------------------------------------------------------------------
-        # 4. NAT Gateway (para subnets privadas)
-        # --------------------------------------------------------------------------------
         MyNatEIP:
             Type: AWS::EC2::EIP
             Properties:
@@ -195,14 +195,11 @@ resources:
             Type: AWS::EC2::NatGateway
             Properties:
                 AllocationId: !GetAtt MyNatEIP.AllocationId
-                SubnetId: !Ref MyPublicSubnet1 # NAT Gateway se ubica en una subnet pública
+                SubnetId: !Ref MyPublicSubnet1
                 Tags:
                     - Key: Name
                       Value: 'myNatGateway-${self:provider.stage}'
 
-        # --------------------------------------------------------------------------------
-        # 5. Subnets Privadas
-        # --------------------------------------------------------------------------------
         MyPrivateSubnet1:
             Type: AWS::EC2::Subnet
             Properties:
@@ -225,7 +222,6 @@ resources:
                     - Key: Name
                       Value: 'myPrivateSubnet2-${self:provider.stage}'
 
-        # Route Table para subnets privadas
         MyPrivateRouteTable:
             Type: AWS::EC2::RouteTable
             Properties:
@@ -241,7 +237,6 @@ resources:
                 DestinationCidrBlock: '0.0.0.0/0'
                 NatGatewayId: !Ref MyNatGateway
 
-        # Asociaciones de route table con cada subnet privada
         MyPrivateSubnet1RouteTableAssoc:
             Type: AWS::EC2::SubnetRouteTableAssociation
             Properties:
@@ -254,34 +249,25 @@ resources:
                 SubnetId: !Ref MyPrivateSubnet2
                 RouteTableId: !Ref MyPrivateRouteTable
 
-        # --------------------------------------------------------------------------------
-        # 6. Security Group para Lambdas
-        # --------------------------------------------------------------------------------
         MyLambdaSG:
             Type: AWS::EC2::SecurityGroup
             Properties:
                 GroupDescription: 'Security group for serverless Lambdas'
                 VpcId: !Ref MyVPC
                 SecurityGroupIngress:
-                    # Normalmente Lambdas no necesitan inbound, a menos que quieras debugger/SSH
                 SecurityGroupEgress:
-                    # Permite salir a cualquier lado (para llamadas a internet, NASA, SWAPI, etc.)
                     - IpProtocol: -1
                       CidrIp: 0.0.0.0/0
                 Tags:
                     - Key: Name
                       Value: 'myLambdaSG-${self:provider.stage}'
 
-        # --------------------------------------------------------------------------------
-        # 7. Security Group para Redis
-        # --------------------------------------------------------------------------------
         MyRedisSG:
             Type: AWS::EC2::SecurityGroup
             Properties:
                 GroupDescription: 'Security group for Redis ElastiCache'
                 VpcId: !Ref MyVPC
                 SecurityGroupIngress:
-                    # Permitir conexiones desde el SG de Lambda en el puerto 6379
                     - IpProtocol: tcp
                       FromPort: 6379
                       ToPort: 6379
@@ -293,9 +279,6 @@ resources:
                     - Key: Name
                       Value: 'myRedisSG-${self:provider.stage}'
 
-        # --------------------------------------------------------------------------------
-        # 8. ElastiCache Subnet Group
-        # --------------------------------------------------------------------------------
         MyRedisSubnetGroup:
             Type: AWS::ElastiCache::SubnetGroup
             Properties:
@@ -304,9 +287,6 @@ resources:
                     - !Ref MyPrivateSubnet1
                     - !Ref MyPrivateSubnet2
 
-        # --------------------------------------------------------------------------------
-        # 9. ElastiCache (Redis)
-        # --------------------------------------------------------------------------------
         MyRedisCache:
             Type: AWS::ElastiCache::CacheCluster
             Properties:
@@ -318,9 +298,6 @@ resources:
                     - !GetAtt MyRedisSG.GroupId
                 CacheSubnetGroupName: !Ref MyRedisSubnetGroup
 
-        # --------------------------------------------------------------------------------
-        # 10. DynamoDB Table
-        # --------------------------------------------------------------------------------
         FusionadosHistoryTable:
             Type: AWS::DynamoDB::Table
             Properties:
@@ -352,6 +329,16 @@ resources:
                       KeyType: HASH
                     - AttributeName: SK
                       KeyType: RANGE
+        ApiGatewayAuthorizer:
+            Type: AWS::ApiGateway::Authorizer
+            Properties:
+                Name: CognitoAuthorizerWithSecret
+                Type: COGNITO_USER_POOLS
+                IdentitySource: method.request.header.Authorization
+                RestApiId:
+                    Ref: ApiGatewayRestApi
+                ProviderARNs:
+                    - arn:aws:cognito-idp:${self:provider.region}:${aws:accountId}:userpool/${env:COGNITO_USER_POOL_ID_${opt:stage, 'dev'}}
 
     Outputs:
         RedisEndpoint:
