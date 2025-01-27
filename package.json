@@ -37,6 +37,7 @@
 	"dependencies": {
 		"@aws-sdk/client-dynamodb": "^3.734.0",
 		"@aws-sdk/lib-dynamodb": "^3.734.0",
+		"aws-xray-sdk": "^3.10.3",
 		"class-transformer": "^0.5.1",
 		"class-validator": "^0.14.1",
 		"ioredis": "^5.4.2",

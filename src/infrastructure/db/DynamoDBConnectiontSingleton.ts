@@ -4,6 +4,7 @@ import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { inject, singleton } from 'tsyringe';
 import { IAppConfig } from '../../domain/config/IAppConfig';
 import logger from '../logging/logger';
+import AWSXRay from 'aws-xray-sdk';
 
 @singleton()
 export class DynamoDBConnectiontSingleton {
@@ -24,8 +25,9 @@ export class DynamoDBConnectiontSingleton {
 				endpoint: this.config.DYNAMODB_LOCAL_SERVER,
 			}),
 		});
+		const xrayClient = AWSXRay.captureAWSv3Client(client);
+		this.docClient = DynamoDBDocumentClient.from(xrayClient);
 
-		this.docClient = DynamoDBDocumentClient.from(client);
 		logger.info('Conexión a DynamoDBDocumentClient establecida.');
 	}
 
