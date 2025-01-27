@@ -5,23 +5,35 @@ import { validate } from 'class-validator';
 import { CreatePlanetDto } from '../../dto/CreatePlanetDto';
 import { PlanetDto } from '../../dto/PlanetDto';
 import { CreatePlanetUseCase } from '../../../application/use-cases/CreatePlanetUseCase';
+import logger from '../../../infrastructure/logging/logger';
 
 export const createPlanetHandler = async (
 	event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+	logger.info('Handler `createPlanetHandler` invoked', {
+		path: event.path,
+		method: event.httpMethod,
+	});
+
 	try {
 		if (!event.body) {
+			logger.warn('Request body is missing');
 			return {
 				statusCode: 400,
 				body: JSON.stringify({ error: 'No body provided' }),
 			};
 		}
 
+		logger.debug('Parsing request body...');
 		const bodyObj = JSON.parse(event.body);
-		const createDto = plainToInstance(CreatePlanetDto, bodyObj);
 
+		logger.debug('Validating request body...');
+		const createDto = plainToInstance(CreatePlanetDto, bodyObj);
 		const errors = await validate(createDto);
 		if (errors.length > 0) {
+			logger.warn('Validation failed', {
+				errors: errors.map((e) => e.constraints),
+			});
 			return {
 				statusCode: 400,
 				body: JSON.stringify({
@@ -31,6 +43,7 @@ export const createPlanetHandler = async (
 			};
 		}
 
+		logger.info('Calling CreatePlanetUseCase...', { planetData: bodyObj });
 		const useCase = container.resolve(CreatePlanetUseCase);
 		const planet = await useCase.execute({
 			name: createDto.name,
@@ -39,6 +52,9 @@ export const createPlanetHandler = async (
 			population: createDto.population,
 		});
 
+		logger.info('Planet created successfully', { planetId: planet.id });
+
+		logger.debug('Transforming response data...');
 		const responseDto = plainToInstance(PlanetDto, planet, {
 			excludeExtraneousValues: true,
 		});
@@ -56,7 +72,10 @@ export const createPlanetHandler = async (
 			}),
 		};
 	} catch (error: any) {
-		console.error('Error creating planet:', error);
+		logger.error('Error occurred in createPlanetHandler', {
+			error: error.message,
+			stack: error.stack,
+		});
 		return {
 			statusCode: 500,
 			body: JSON.stringify({

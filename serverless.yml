@@ -6,6 +6,7 @@ provider:
     runtime: nodejs20.x
     region: us-east-2
     stage: ${opt:stage, 'dev'}
+    logRetentionInDays: 1
 
     # Lambdas se ubican en las subnets privadas y usan SG de Lambda
     vpc:
@@ -26,6 +27,7 @@ provider:
         REDIS_PORT: '6379'
         DYNAMODB_LOCAL_SERVER: 'http://localhost:8000'
         CACHE_TTL_SECONDS: ${env:CACHE_TTL_SECONDS_${opt:stage, 'dev'}}
+        LOG_LEVEL: ${env:LOG_LEVEL_${opt:stage, 'dev'}}
 
     iam:
         role:
