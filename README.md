@@ -27,52 +27,20 @@ La documentación interactiva de la API está disponible a través de Swagger. C
 
 [Documentación API](https://sofftek.digitalbonds.link/docs)
 
-## Requisitos
-
-- **AWS CLI** instalado y configurado.
-- **Node.js** 16 o superior.
-- Cuenta de AWS con permisos para gestionar servicios como Lambda, API Gateway, DynamoDB y Cognito.
-
-## Instalación
-
-1. Clona el repositorio:
-   ```bash
-   git clone https://github.com/tu-usuario/backend-softtek-challenge.git
-   cd backend-softtek-challenge
-   ```
-
-2. Instala las dependencias:
-   ```bash
-   npm install
-   ```
-
-3. Configura tus credenciales de AWS:
-   ```bash
-   aws configure
-   ```
-
-4. Despliega la infraestructura con Serverless:
-   ```bash
-   serverless deploy --stage dev
-   ```
-
-## Uso
-
-1. Consulta la documentación de la API para conocer los endpoints disponibles: [Documentación API](https://sofftek.digitalbonds.link/docs).
-2. Realiza solicitudes a los endpoints usando herramientas como Postman o cURL.
-
-## Estructura del Proyecto
+## Estructura del Proyecto (Resumen)
 
 ```plaintext
+backend-softtek-challenge/
 ├── src/
-│   ├── application/     # Casos de uso
-│   ├── domain/          # Modelos y repositorios de dominio
-│   ├── infrastructure/  # Conexión con servicios externos y configuraciones
-│   ├── interface/       # Controladores y endpoints
-│   └── __integration__/ # Pruebas de integración
-├── serverless.yml       # Configuración de Serverless Framework
-├── package.json         # Dependencias y scripts
-└── README.md            # Documentación del proyecto
+│   ├── interface/         # Handlers, DTOs y adaptadores para la API
+│   ├── application/       # Casos de uso
+│   ├── domain/            # Entidades y repositorios
+│   ├── infrastructure/    # Configuraciones y servicios externos
+│   └── __integration__/   # Pruebas de integración
+├── serverless.yml         # Configuración de Serverless Framework
+├── docker-compose.yml     # Configuración de dynamoDB para desarrollo local
+├── package.json           # Dependencias y scripts
+└── README.md              # Documentación del proyecto
 ```
 
 ## Tecnologías Usadas
@@ -82,7 +50,6 @@ La documentación interactiva de la API está disponible a través de Swagger. C
 - **Swagger:** Generación y consulta de documentación interactiva de la API.
 - **Serverless Framework:** Orquestación y despliegue de la infraestructura.
 - **Clean Architecture:** Organización del código en capas.
-
 
 ## Contribuciones
 
