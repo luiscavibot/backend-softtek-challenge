@@ -7,6 +7,9 @@ provider:
     region: us-east-2
     stage: ${opt:stage, 'dev'}
     logRetentionInDays: 1
+    tracing:
+        lambda: true
+        apiGateway: true
 
     # Lambdas se ubican en las subnets privadas y usan SG de Lambda
     vpc:
@@ -43,6 +46,13 @@ provider:
                   Resource:
                       - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.HISTORY_TABLE}'
                       - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.STARWARS_PLANETS_TABLE}'
+
+                - Effect: Allow
+                  Action:
+                      - xray:PutTraceSegments
+                      - xray:PutTelemetryRecords
+                  Resource:
+                      - 'arn:aws:xray:${self:provider.region}:${aws:accountId}:*'
 
 functions:
     getPeople:
