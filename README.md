@@ -50,7 +50,7 @@ backend-softtek-challenge/
 └── README.md              # Documentación del proyecto
 ```
 
-## Otros tecnologías usadas
+## Otras tecnologías usadas
 
 - **Node.js:** Lenguaje principal para el backend.
 - **Typescript:** Extensión de JS para tipado estático y otras funcionalidades adicionales.
