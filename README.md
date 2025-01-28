@@ -30,9 +30,9 @@ Este proyecto implementa una solución backend que aprovecha servicios de AWS y 
    - **Singleton:** Garantiza únicas instancias globales donde sea necesario.
 
 ## Arquitectura
+![image](https://github.com/user-attachments/assets/e2489cf8-6f94-4178-a10f-70cb784368f2)
 
 ## Documentación de la API
-![image](https://github.com/user-attachments/assets/e2489cf8-6f94-4178-a10f-70cb784368f2)
 
 La documentación interactiva de la API está disponible a través de Swagger. Consulta todos los detalles en:
 
