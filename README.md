@@ -21,14 +21,18 @@ Este proyecto implementa una solución backend que aprovecha servicios de AWS y 
    - **Internet Gateway y NAT Gateway:** Para gestionar el acceso a internet desde los recursos dentro de la VPC.
    - **Security Groups:** Control de acceso detallado para las Lambdas y Redis.
 9. **Amazon Cloudfront:** Infrsestructura de red privilegiada basada en puntos de presencia cercanos al usuario.
-10. **Clean Architecture:** División clara de responsabilidades en capas, facilitando el mantenimiento.
-11. **Pruebas Unitarias e Integración:** Cobertura de funcionalidades clave del proyecto.
-12. **Patrones de Diseño:**
+10. **Amazon Cognito:** Autenticación de usuarios.
+11. **Clean Architecture:** División clara de responsabilidades en capas, facilitando el mantenimiento.
+12. **Pruebas Unitarias e Integración:** Cobertura de funcionalidades clave del proyecto.
+13. **Patrones de Diseño:**
    - **DI Container:** Simplifica la gestión de dependencias.
    - **Decorador:** Facilita la extensión de funcionalidades.
    - **Singleton:** Garantiza únicas instancias globales donde sea necesario.
 
+## Arquitectura
+
 ## Documentación de la API
+![image](https://github.com/user-attachments/assets/e2489cf8-6f94-4178-a10f-70cb784368f2)
 
 La documentación interactiva de la API está disponible a través de Swagger. Consulta todos los detalles en:
 
