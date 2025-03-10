@@ -34,10 +34,11 @@ export class CreatePlanetUseCase {
 			});
 
 			return createdPlanet;
-		} catch (error: any) {
+		} catch (error: unknown) {
+			const errorTyped = error as Error;
 			logger.error('Error al crear el planeta.', {
-				error: error.message,
-				stack: error.stack,
+				error: errorTyped.message,
+				stack: errorTyped.stack,
 			});
 			throw error;
 		}

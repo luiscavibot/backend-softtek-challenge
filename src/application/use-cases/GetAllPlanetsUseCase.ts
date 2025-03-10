@@ -20,10 +20,12 @@ export class GetAllPlanetsUseCase {
 				count: planets.length,
 			});
 			return planets;
-		} catch (error: any) {
+		} catch (error: unknown) {
+			const errorTyped = error as Error;
+
 			logger.error('Error en `GetAllPlanetsUseCase`.', {
-				error: error.message,
-				stack: error.stack,
+				error: errorTyped.message,
+				stack: errorTyped.stack,
 			});
 			throw error;
 		}

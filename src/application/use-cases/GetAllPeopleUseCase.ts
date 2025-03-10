@@ -5,6 +5,7 @@ import { SWPerson } from '../../domain/entities/SWPerson';
 import { ICacheRepository } from '../../domain/repositories/ICacheRepository';
 import { IAppConfig } from '../../domain/config/IAppConfig';
 import logger from '../../infrastructure/logging/logger';
+import { ResultsWithApod } from '../../domain/entities/ApodData';
 
 @injectable()
 export class GetAllPeopleUseCase {
@@ -29,12 +30,14 @@ export class GetAllPeopleUseCase {
 		});
 	}
 
-	public async execute(): Promise<any[]> {
+	public async execute(): Promise<ResultsWithApod[]> {
 		const cacheKey = 'fusionados-people';
 
 		try {
 			logger.info('Intentando recuperar datos del caché.', { cacheKey });
-			const cachedValue = await this.cacheRepo.getValue<any[]>(cacheKey);
+			const cachedValue = await this.cacheRepo.getValue<
+				ResultsWithApod[]
+			>(cacheKey);
 
 			if (cachedValue) {
 				logger.info('Datos recuperados desde el caché.', { cacheKey });
@@ -58,7 +61,7 @@ export class GetAllPeopleUseCase {
 				count: resultsWithApod.length,
 			});
 
-			await this.cacheRepo.setValue<any[]>(
+			await this.cacheRepo.setValue<ResultsWithApod[]>(
 				cacheKey,
 				resultsWithApod,
 				this.cacheTtlSeconds
@@ -69,10 +72,11 @@ export class GetAllPeopleUseCase {
 			});
 
 			return resultsWithApod;
-		} catch (error: any) {
+		} catch (error: unknown) {
+			const errorTyped = error as Error;
 			logger.error('Error en `GetAllPeopleUseCase`.', {
-				error: error.message,
-				stack: error.stack,
+				error: errorTyped.message,
+				stack: errorTyped.stack,
 			});
 			throw error;
 		}

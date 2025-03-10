@@ -1,3 +1,5 @@
+import { SWPerson } from './SWPerson';
+
 export interface ApodData {
 	copyright?: string;
 	date: string;
@@ -7,4 +9,8 @@ export interface ApodData {
 	service_version: string;
 	title: string;
 	url: string;
+}
+
+export interface ResultsWithApod extends SWPerson {
+	randomGalaxyPhoto: ApodData;
 }
