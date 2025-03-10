@@ -36,7 +36,7 @@ Este proyecto implementa una solución backend que aprovecha servicios de AWS y 
 
 La documentación interactiva de la API está disponible a través de Swagger. Consulta todos los detalles en:
 
-[Documentación API](https://sofftek.digitalbonds.link/docs)
+[Documentación API](https://sofftek.digitalbonds.link/docs](http://swagger-challenge-softtek.s3-website.us-east-2.amazonaws.com)
 
 ## Estructura del Proyecto (Resumen)
 
